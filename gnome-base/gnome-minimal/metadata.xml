@@ -5,4 +5,7 @@
 		<email>me@a5y.rocks</email>
 		<name>Anthony Lazara</name>
 	</maintainer>
+	<use>
+		<flag name="gnome-shell">Pull in <pkg>gnome-base/gnome-shell</pkg> and <pkg>x11-wm/mutter</pkg></flag>
+	</use>
 </pkgmetadata>
