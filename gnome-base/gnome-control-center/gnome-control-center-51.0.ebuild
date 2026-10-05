@@ -98,7 +98,7 @@ BDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}/0003-remove-donate-row-from-about-panel-51.0.patch"
+	"${FILESDIR}/0003-about-rm-donate-row-from-about-page-51.0.patch"
 )
 
 python_check_deps() {
