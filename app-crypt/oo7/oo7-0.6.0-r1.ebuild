@@ -14,7 +14,7 @@ CRATES="
 	anstyle-wincon@3.0.11
 	anstyle@1.0.13
 	anyhow@1.0.102
-	ashpd@0.13.0
+	ashpd@0.13.13
 	async-broadcast@0.7.2
 	async-channel@2.5.0
 	async-executor@1.14.0
@@ -180,6 +180,7 @@ CRATES="
 	strsim@0.11.1
 	subtle@2.6.1
 	syn@2.0.117
+	syn@3.0.6
 	target-lexicon@0.13.5
 	temp-dir@0.1.16
 	tempfile@3.25.0
@@ -247,23 +248,25 @@ CRATES="
 	windows_x86_64_msvc@0.52.6
 	windows_x86_64_msvc@0.53.1
 	winnow@0.7.14
+	winnow@1.0.4
 	wit-bindgen-core@0.51.0
 	wit-bindgen-rust-macro@0.51.0
 	wit-bindgen-rust@0.51.0
 	wit-bindgen@0.51.0
 	wit-component@0.244.0
 	wit-parser@0.244.0
-	zbus@5.13.2
-	zbus_macros@5.13.2
-	zbus_names@4.3.1
+	zbus@5.18.0
+	zbus_macros@5.19.0
+	zbus_names@4.3.4
+	zcheapstr@1.1.0
 	zerocopy-derive@0.8.39
 	zerocopy@0.8.39
 	zeroize@1.8.2
 	zeroize_derive@1.4.3
 	zmij@1.0.21
-	zvariant@5.9.2
-	zvariant_derive@5.9.2
-	zvariant_utils@3.3.0
+	zvariant@5.15.0
+	zvariant_derive@5.15.0
+	zvariant_utils@4.2.0
 "
 
 inherit cargo meson pam systemd
@@ -293,6 +296,11 @@ BDEPEND="
 	>=dev-build/meson-1.7.0
 	sys-devel/gettext
 "
+
+PATCHES=(
+	"${FILESDIR}/${PN}-${PV}-portal-ashpd-0.13.13.patch"
+	"${FILESDIR}/${PN}-${PV}-cargo-lock-ashpd-0.13.13.patch"
+)
 
 src_configure() {
 	local emesonargs=(

@@ -1,0 +1,66 @@
+gnome's secret-service copium
+
+--- a/portal/src/main.rs
++++ b/portal/src/main.rs
+@@ -1,8 +1,8 @@
+-use std::{collections::HashMap, future::pending, os::unix::net::UnixStream, sync::Arc};
++use std::{collections::HashMap, future::pending, sync::Arc};
+ mod error;
+ 
+ use ashpd::{
+-    AppID, PortalError, async_trait,
++    PortalError, async_trait,
+     desktop::HandleToken,
+     zbus::{self, zvariant::OwnedValue},
+ };
+@@ -36,7 +36,7 @@
+     async fn retrieve(
+         &self,
+         token: HandleToken,
+-        app_id: ashpd::AppID,
++        app_id: ashpd::MaybeAppID,
+         fd: std::os::fd::OwnedFd,
+     ) -> ashpd::backend::Result<HashMap<String, OwnedValue>> {
+         tracing::debug!("Request from app: {app_id}");
+@@ -66,22 +66,26 @@
+ }
+ 
+ /// Generates, stores and send the secret back to the fd stream
+-async fn send_secret_to_app(app_id: &AppID, fd: std::os::fd::OwnedFd) -> Result<()> {
++async fn send_secret_to_app(app_id: &ashpd::MaybeAppID, fd: std::os::fd::OwnedFd) -> Result<()> {
+     let service = Service::new().await?;
+     let collection = service.default_collection().await?;
++    let Ok(app_id) = app_id.inner() else {
++        return Err(
++            ashpd::PortalError::InvalidArgument(format!("A valid App ID is required")).into(),
++        );
++    };
++
+     let attributes = &[("app_id", app_id)];
+ 
+-    // Write the secret to the FD.
+-    let std_stream = UnixStream::from(fd);
+-    std_stream.set_nonblocking(true)?;
+-    let mut stream = tokio::net::UnixStream::from_std(std_stream)?;
++    // Write the secret to the FD (may be a pipe or a socket).
++    let mut file = tokio::fs::File::from_std(std::fs::File::from(fd));
+ 
+     if collection.is_locked().await? {
+         collection.unlock(None).await?;
+     }
+ 
+     if let Some(item) = collection.search_items(attributes).await?.first() {
+-        stream.write_all(&item.secret().await?).await?;
++        file.write_all(&item.secret().await?).await?;
+     } else {
+         tracing::debug!("Could not find secret for {app_id}, creating one");
+         let secret = oo7::Secret::random().unwrap();
+@@ -96,7 +100,7 @@
+             )
+             .await?;
+ 
+-        stream.write_all(&secret).await?;
++        file.write_all(&secret).await?;
+     }
+ 
+     Ok(())
