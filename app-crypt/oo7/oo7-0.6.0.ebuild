@@ -285,6 +285,7 @@ KEYWORDS="~amd64"
 IUSE="pam"
 
 RDEPEND="
+	!gnome-base/gnome-keyring
 	sys-apps/systemd
 	pam? ( sys-libs/pam )
 "
