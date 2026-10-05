@@ -323,4 +323,8 @@ src_install() {
 	for dir in server portal $(usev pam); do
 		BUILD_DIR=${S}/${dir}/build meson_src_install
 	done
+
+	# pam_oo7 auto_start execs this hardcoded path
+	dosym ../libexec/oo7-daemon /usr/bin/oo7-daemon
+	dosym ../oo7-daemon.service "$(systemd_get_userunitdir)"/default.target.wants/oo7-daemon.service
 }
